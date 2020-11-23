@@ -3,7 +3,7 @@ import rosbag
 import sensor_msgs.point_cloud2 as pc2
 import pcl
 import numpy as np
-from pathlib import Path
+from pathlib2 import Path
 import glob
 
 if __name__=='__main__':
@@ -25,6 +25,7 @@ if __name__=='__main__':
         Path(save_path).mkdir(parents=True, exist_ok=True)
 
         for lidar_topic, lidar_msg, lidar_t in bag.read_messages(topics=[args.lidar_topic]):
+
             # lidar msg to numpy array(n,4)
             list_pc = []
             for data in pc2.read_points(lidar_msg, skip_nans=True):  
