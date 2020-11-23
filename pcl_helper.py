@@ -22,6 +22,48 @@ from std_msgs.msg import Header
 from random import randint
 
 
+def xyzrgb_array_to_pointcloud2(points, colors, stamp=None, frame_id=None, seq=None):
+    '''
+    Create a sensor_msgs.PointCloud2 from an array
+    of points.
+    '''
+    msg = PointCloud2()
+    assert(points.shape == colors.shape)
+
+    buf = []
+
+    if stamp:
+        msg.header.stamp = stamp
+    if frame_id:
+        msg.header.frame_id = frame_id
+    if seq:
+        msg.header.seq = seq
+    if len(points.shape) == 3:
+        msg.height = points.shape[1]
+        msg.width = points.shape[0]
+    else:
+        N = len(points)
+        xyzrgb = np.array(np.hstack([points, colors]), dtype=np.float32)
+        msg.height = 1
+        msg.width = N
+
+    msg.fields = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1),
+        PointField('r', 12, PointField.FLOAT32, 1),
+        PointField('g', 16, PointField.FLOAT32, 1),
+        PointField('b', 20, PointField.FLOAT32, 1)
+    ]
+    msg.is_bigendian = False
+    msg.point_step = 24
+    msg.row_step = msg.point_step * N
+    msg.is_dense = True;
+    msg.data = xyzrgb.tostring()
+
+    return msg 
+
+
 def random_color_gen():
     """ Generates a random color
         Args: None
